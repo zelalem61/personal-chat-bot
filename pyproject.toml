@@ -1,0 +1,104 @@
+# Portfolio Bot - Project Configuration
+#
+# This file configures development tools like Black (code formatter)
+# and isort (import sorter).
+
+[project]
+name = "portfolio-bot"
+version = "0.1.0"
+description = "A LangGraph learning project for building a portfolio chatbot"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.black]
+# Black - The Uncompromising Code Formatter
+# https://black.readthedocs.io/
+line-length = 120
+target-version = ["py311"]
+skip-string-normalization = true
+skip-magic-trailing-comma = true
+
+[tool.isort]
+# isort - Sort imports automatically
+# https://pycqa.github.io/isort/
+profile = "black"
+line_length = 120
+skip_gitignore = true
+known_first_party = ["portfolio_bot"]
+
+[tool.ruff]
+# Ruff - Fast Python linter
+# https://docs.astral.sh/ruff/
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # Pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+]
+
+[tool.pytest.ini_options]
+# Pytest configuration
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+# =============================================================================
+# LEARNING NOTES
+# =============================================================================
+#
+# What is pyproject.toml?
+# -----------------------
+# This is the modern standard for Python project configuration.
+# It replaces setup.py, setup.cfg, and tool-specific config files.
+#
+# Tool Configuration
+# ------------------
+# Each [tool.X] section configures a specific tool:
+#
+# - black: Code formatter - makes code style consistent
+# - isort: Sorts imports alphabetically and by type
+# - ruff: Fast linter - finds potential bugs and style issues
+# - pytest: Test runner configuration
+#
+# Usage
+# -----
+# Format code:
+#   black portfolio_bot
+#
+# Sort imports:
+#   isort portfolio_bot
+#
+# Lint code:
+#   ruff check portfolio_bot
+#
+# Run tests:
+#   pytest
+#
+# Pre-commit Hooks
+# ----------------
+# Consider setting up pre-commit hooks to run these automatically:
+#
+# 1. Install: pip install pre-commit
+# 2. Create .pre-commit-config.yaml (see below)
+# 3. Install hooks: pre-commit install
+#
+# Example .pre-commit-config.yaml:
+# ```yaml
+# repos:
+#   - repo: https://github.com/psf/black
+#     rev: 24.3.0
+#     hooks:
+#       - id: black
+#   - repo: https://github.com/pycqa/isort
+#     rev: 5.13.0
+#     hooks:
+#       - id: isort
+# ```

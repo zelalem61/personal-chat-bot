@@ -1,0 +1,88 @@
+# Docker Compose configuration for Portfolio Bot
+#
+# This file sets up ChromaDB as the vector store.
+# The bot itself runs locally (not in Docker) for easier development.
+#
+# Usage:
+#   docker-compose up -d     # Start ChromaDB in background
+#   docker-compose down      # Stop ChromaDB
+#   docker-compose logs -f   # View ChromaDB logs
+
+version: '3.8'
+
+services:
+  # =========================================================================
+  # ChromaDB - Vector Database for RAG
+  # =========================================================================
+  # ChromaDB stores document embeddings and enables semantic search.
+  # Data is persisted in a Docker volume.
+  #
+  # Access:
+  #   - API: http://localhost:8000
+  #   - Health check: http://localhost:8000/api/v1/heartbeat
+
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: portfolio-chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      # Disable telemetry
+      - ANONYMIZED_TELEMETRY=False
+      # Allow connections from any host (for development)
+      - CHROMA_SERVER_HOST=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+# Persistent storage for ChromaDB data
+volumes:
+  chroma_data:
+    name: portfolio_chroma_data
+
+# =============================================================================
+# LEARNING NOTES
+# =============================================================================
+#
+# What is ChromaDB?
+# -----------------
+# ChromaDB is an open-source vector database designed for AI applications.
+# It stores "embeddings" - numerical representations of text that capture
+# semantic meaning. This enables "semantic search" - finding documents
+# by meaning rather than exact keyword matches.
+#
+# Why Docker?
+# -----------
+# Running ChromaDB in Docker provides:
+# 1. Data persistence - Your embeddings survive app restarts
+# 2. Isolation - Doesn't affect your system Python
+# 3. Easy setup - One command to start
+# 4. Production-like - Similar to how you'd deploy it
+#
+# Common Commands
+# ---------------
+# Start:   docker-compose up -d
+# Stop:    docker-compose down
+# Logs:    docker-compose logs -f chromadb
+# Restart: docker-compose restart chromadb
+# Reset:   docker-compose down -v  (WARNING: deletes all data!)
+#
+# Troubleshooting
+# ---------------
+# If ChromaDB won't start:
+# 1. Check if port 8000 is in use: lsof -i :8000
+# 2. Check logs: docker-compose logs chromadb
+# 3. Reset volume: docker-compose down -v && docker-compose up -d
+#
+# Production Notes
+# ----------------
+# For production, consider:
+# - Running ChromaDB on a separate server
+# - Using authentication (CHROMA_SERVER_AUTH_*)
+# - Setting up backups for the data volume
+# - Using a managed vector database service
