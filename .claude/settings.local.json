@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//home/thomas/Downloads/**)",
+      "WebFetch(domain:docs.arcade.dev)",
+      "Bash(mkdir:*)",
+      "Bash(cat:*)",
+      "Bash(git add:*)",
+      "Bash(git diff:*)",
+      "Bash(tree:*)",
+      "Bash(wc:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(python -m py_compile:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
