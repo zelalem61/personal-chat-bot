@@ -33,7 +33,7 @@ YOUR TASK: (See roadmap.md Step 1)
 """
 
 from enum import Enum
-from typing import Annotated, Optional, TypedDict
+from typing import Annotated, Any, Dict, Optional, TypedDict
 
 from langchain_core.messages import BaseMessage
 from langgraph.graph.message import add_messages
@@ -41,44 +41,104 @@ from pydantic import BaseModel, Field
 
 
 # =============================================================================
-# TODO: Implement RouteType Enum
+# RouteType Enum
 # =============================================================================
-# Hint: class RouteType(str, Enum):
-#           RAG = "rag"
-#           ...
-pass
+
+
+class RouteType(str, Enum):
+    """
+    Route type selected by the router.
+
+    - RAG:   Retrieve documents then answer
+    - TOOL:  Call a tool, then answer
+    - DIRECT: Answer directly with no extra context
+    """
+
+    RAG = "rag"
+    TOOL = "tool"
+    DIRECT = "direct"
 
 
 # =============================================================================
-# TODO: Implement NodeState TypedDict
+# NodeState TypedDict
 # =============================================================================
-# Hint: class NodeState(TypedDict, total=False):
-#           messages: Annotated[list[BaseMessage], add_messages]
-#           route_type: RouteType
-#           documents: list[dict]
-#           ...
-pass
+
+
+class NodeState(TypedDict, total=False):
+    """
+    Core graph state shared between all nodes.
+
+    Each node reads some fields and returns a partial update with the fields
+    it wants to modify. LangGraph merges those updates using reducers.
+    """
+
+    # Conversation history; add_messages appends new messages
+    messages: Annotated[list[BaseMessage], add_messages]
+
+    # Routing information
+    route_type: RouteType
+    tool_name: Optional[str]
+    tool_args: Dict[str, Any]
+
+    # Results from tool execution
+    tool_result: Optional[Any]
+
+    # Retrieved documents for RAG
+    documents: list[Dict[str, Any]]
+
+    # Final response text for the user
+    final_response: Optional[str]
 
 
 # =============================================================================
-# TODO: Implement InputState TypedDict
+# InputState TypedDict
 # =============================================================================
-# Hint: Just needs messages field with add_messages reducer
-pass
+
+
+class InputState(TypedDict):
+    """
+    External input to the graph.
+
+    For this bot, the only required input is the list of messages.
+    """
+
+    messages: Annotated[list[BaseMessage], add_messages]
 
 
 # =============================================================================
-# TODO: Implement OutputState TypedDict
+# OutputState TypedDict
 # =============================================================================
-# Hint: Needs messages and final_response fields
-pass
+
+
+class OutputState(TypedDict, total=False):
+    """
+    External output from the graph.
+
+    Exposes the final response and (optionally) the full message history.
+    """
+
+    messages: list[BaseMessage]
+    final_response: str
 
 
 # =============================================================================
-# TODO: Implement RouteDecision Pydantic Model
+# RouteDecision Pydantic Model
 # =============================================================================
-# Hint: class RouteDecision(BaseModel):
-#           route_type: RouteType = Field(description="...")
-#           tool_name: Optional[str] = Field(default=None, ...)
-#           reasoning: str = Field(description="...")
-pass
+
+
+class RouteDecision(BaseModel):
+    """
+    Structured output returned by the router LLM.
+    """
+
+    route_type: RouteType = Field(
+        description="How the query should be handled: 'rag', 'tool', or 'direct'."
+    )
+    tool_name: Optional[str] = Field(
+        default=None,
+        description="Name of the tool to call when route_type is 'tool'; otherwise None.",
+    )
+    reasoning: str = Field(
+        description="Brief explanation of why this route was chosen."
+    )
+

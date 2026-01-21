@@ -62,6 +62,7 @@ python -m portfolio_bot.api.main
 ```
 
 Open http://localhost:8004/docs to see the API documentation.
+Open http://localhost:8004/chat to use the web chat UI.
 
 ### 7. Test It
 

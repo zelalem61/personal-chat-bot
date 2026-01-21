@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Portfolio Bot</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div class="title">Portfolio Bot</div>
+        <div class="subtitle">Ask about experience, skills, projects, and more</div>
+      </header>
+
+      <main id="chat" class="chat" aria-live="polite"></main>
+
+      <footer class="composer">
+        <form id="form" class="composerForm" autocomplete="off">
+          <input
+            id="message"
+            class="composerInput"
+            type="text"
+            placeholder="Type a message…"
+            maxlength="4000"
+            required
+          />
+          <button id="send" class="composerButton" type="submit">Send</button>
+        </form>
+        <div class="meta">
+          <button id="newThread" class="linkButton" type="button">New conversation</button>
+          <span id="status" class="status"></span>
+        </div>
+      </footer>
+    </div>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
+

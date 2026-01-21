@@ -32,21 +32,73 @@ logger = get_logger(__name__)
 
 
 # =============================================================================
-# TODO: Implement Router Class
+# Router Class
 # =============================================================================
-# class Router:
-#     def __init__(self):
-#         # Create a structured chain that returns RouteDecision
-#         # self._chain = ChainBuilder(temperature=0.0).build_structured_chain(
-#         #     system_prompt=ROUTER_SYSTEM_PROMPT,
-#         #     human_prompt=ROUTER_HUMAN_PROMPT,
-#         #     output_model=RouteDecision,
-#         # )
-#         pass
-#
-#     async def run(self, state: NodeState) -> dict:
-#         # 1. Get the last HumanMessage from state["messages"]
-#         # 2. Invoke the chain with {"query": query, "context": "..."}
-#         # 3. Return {"route_type": decision.route_type, "tool_name": decision.tool_name}
-#         pass
-pass
+
+
+class Router:
+    """
+    Classifies incoming user queries into RAG, TOOL, or DIRECT routes.
+
+    Uses a structured-output chain that returns a `RouteDecision` Pydantic model.
+    """
+
+    def __init__(self):
+        # Create a structured chain that returns RouteDecision
+        self._chain = ChainBuilder(temperature=0.0).build_structured_chain(
+            system_prompt=ROUTER_SYSTEM_PROMPT,
+            human_prompt=ROUTER_HUMAN_PROMPT,
+            output_model=RouteDecision,
+        )
+        logger.info("Router initialized with structured routing chain")
+
+    async def run(self, state: NodeState) -> dict:
+        """
+        Classify the latest user message and decide the processing route.
+
+        Args:
+            state: Current graph state including conversation messages.
+
+        Returns:
+            dict: Partial state update with `route_type` and optional `tool_name`.
+        """
+        messages = state.get("messages", [])
+
+        # 1. Get the last HumanMessage from state["messages"]
+        query = None
+        for msg in reversed(messages):
+            if isinstance(msg, HumanMessage):
+                query = msg.content
+                break
+
+        if not query:
+            logger.warning(
+                "Router.run called with no HumanMessage in state; defaulting to DIRECT route."
+            )
+            return {"route_type": RouteType.DIRECT}
+
+        # Build a lightweight textual context from previous messages (excluding latest).
+        context_parts = []
+        for msg in messages[:-1]:
+            role = getattr(msg, "type", "message")
+            content = getattr(msg, "content", "")
+            context_parts.append(f"{role}: {content}")
+        context = "\n".join(context_parts).strip()
+
+        # 2. Invoke the chain with {"query": query, "context": "..."}
+        decision: RouteDecision = await self._chain.ainvoke(
+            {"query": query, "context": context}
+        )
+
+        logger.info(
+            "Router decision: route_type=%s, tool_name=%s",
+            decision.route_type,
+            getattr(decision, "tool_name", None),
+        )
+
+        # 3. Return state update
+        return {
+            "route_type": decision.route_type,
+            "tool_name": getattr(decision, "tool_name", None),
+        }
+

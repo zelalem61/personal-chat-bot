@@ -35,25 +35,91 @@ logger = get_logger(__name__)
 
 # =============================================================================
 # TODO: Implement LLMManager Class
-# =============================================================================
-# Requirements:
-# - Singleton pattern using __new__ (see app_config.py for example)
-# - __init__ should load config and set _chat_model, _embeddings to None
-# - get_chat_model(temperature: float = 0.7) -> ChatOpenAI
-# - get_embeddings() -> OpenAIEmbeddings
-#
-# Hint for ChatOpenAI:
-#   ChatOpenAI(model=config.openai_model, temperature=temperature, api_key=config.openai_api_key)
-#
-# Hint for OpenAIEmbeddings:
-#   OpenAIEmbeddings(model=config.openai_embedding_model, api_key=config.openai_api_key)
-pass
+class LLMManager:
+    """
+    Singleton manager that provides access to shared LLM resources.
+
+    Responsibilities:
+    - Lazily create and cache a `ChatOpenAI` instance
+    - Lazily create and cache an `OpenAIEmbeddings` instance
+    - Reuse these instances across the application to avoid unnecessary
+      network handshakes and resource usage.
+    """
+
+    _instance: Optional["LLMManager"] = None
+
+    def __new__(cls) -> "LLMManager":
+        """
+        Singleton implementation - returns existing instance or creates new one.
+        """
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+
+    def __init__(self) -> None:
+        """
+        Initialize manager with configuration.
+
+        LEARNING NOTE: The `_initialized` flag ensures this block only
+        runs once even though `__init__` may be called multiple times
+        on the singleton instance.
+        """
+        if getattr(self, "_initialized", False):
+            return
+
+        self._config = get_config()
+        self._chat_model: Optional[ChatOpenAI] = None
+        self._embeddings: Optional[OpenAIEmbeddings] = None
+
+        self._initialized = True
+
+    def get_chat_model(self, temperature: float = 0.7) -> ChatOpenAI:
+        """
+        Get (or lazily create) a ChatOpenAI model instance.
+
+        Args:
+            temperature: Controls randomness in generation.
+
+        Returns:
+            ChatOpenAI: Configured chat model instance.
+        """
+        # If no model exists yet, or the temperature differs, create a new one.
+        if self._chat_model is None or getattr(self._chat_model, "temperature", None) != temperature:
+            logger.info("Initializing ChatOpenAI model with temperature=%s", temperature)
+            self._chat_model = ChatOpenAI(
+                model=self._config.openai_model,
+                temperature=temperature,
+                api_key=self._config.openai_api_key,
+            )
+        return self._chat_model
+
+    def get_embeddings(self) -> OpenAIEmbeddings:
+        """
+        Get (or lazily create) an OpenAIEmbeddings instance.
+
+        Returns:
+            OpenAIEmbeddings: Configured embeddings model instance.
+        """
+        if self._embeddings is None:
+            logger.info("Initializing OpenAIEmbeddings model")
+            self._embeddings = OpenAIEmbeddings(
+                model=self._config.openai_embedding_model,
+                api_key=self._config.openai_api_key,
+            )
+        return self._embeddings
 
 
 # =============================================================================
 # TODO: Implement get_llm_manager() function
 # =============================================================================
-# Hint: @lru_cache(maxsize=1)
-#       def get_llm_manager() -> LLMManager:
-#           return LLMManager()
-pass
+@lru_cache(maxsize=1)
+def get_llm_manager() -> LLMManager:
+    """
+    Get the singleton LLMManager instance.
+
+    LEARNING NOTE: This uses the same pattern as `get_config` to provide a
+    simple, function-based way to access the shared manager.
+    """
+    return LLMManager()
+

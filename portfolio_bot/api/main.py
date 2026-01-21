@@ -23,21 +23,22 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 
 from portfolio_bot.configs.app_config import get_config
 from portfolio_bot.api.routes.chat import router as chat_router
 from portfolio_bot.logs.logger import setup_logging, get_logger
+from portfolio_bot.core.graph import PortfolioBot
 
 setup_logging()
 logger = get_logger(__name__)
 
 
-# =============================================================================
-# TODO: Import and use PortfolioBot once you implement it
-# =============================================================================
-# from portfolio_bot.core.graph import PortfolioBot
-# bot: PortfolioBot = None
+# Global bot instance, initialized in lifespan
+bot: PortfolioBot | None = None
 
 
 @asynccontextmanager
@@ -45,11 +46,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
     """Initialize bot on startup, cleanup on shutdown."""
     logger.info("Starting Portfolio Bot API...")
 
-    # TODO: Uncomment once you implement PortfolioBot
-    # global bot
-    # bot = PortfolioBot()
-    # await bot.initialize()
-    # app.state.bot = bot
+    global bot
+    bot = PortfolioBot()
+    await bot.initialize()
+    app.state.bot = bot
 
     yield
 
@@ -73,6 +73,10 @@ app.add_middleware(
 
 app.include_router(chat_router, prefix="/api", tags=["chat"])
 
+# Serve the UI (simple static SPA)
+_STATIC_DIR = Path(__file__).resolve().parent / "static"
+app.mount("/static", StaticFiles(directory=_STATIC_DIR), name="static")
+
 
 @app.get("/health")
 async def health_check():
@@ -82,6 +86,12 @@ async def health_check():
 @app.get("/")
 async def root():
     return {"message": "Portfolio Bot API", "docs": "/docs"}
+
+
+@app.get("/chat")
+async def chat_ui():
+    """Serve the chat UI."""
+    return FileResponse(_STATIC_DIR / "index.html")
 
 
 if __name__ == "__main__":

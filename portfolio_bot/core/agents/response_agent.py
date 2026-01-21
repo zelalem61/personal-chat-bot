@@ -31,20 +31,98 @@ from portfolio_bot.logs.logger import get_logger
 logger = get_logger(__name__)
 
 
-# =============================================================================
-# TODO: Implement ResponseAgent Class
-# =============================================================================
-# class ResponseAgent:
-#     def __init__(self, owner_name: str = "Portfolio Owner"):
-#         self._owner_name = owner_name
-#         # Create chain with RESPONSE_SYSTEM_PROMPT.format(owner_name=owner_name)
-#         # self._chain = ChainBuilder(temperature=0.7).build_chain(...)
-#         pass
-#
-#     async def run(self, state: NodeState) -> dict:
-#         # 1. Extract query from messages, documents from state, tool_result from state
-#         # 2. Format documents into a context string
-#         # 3. Invoke chain with {"query": ..., "context": ..., "tool_results": ...}
-#         # 4. Return {"messages": [AIMessage(content=response)], "final_response": response}
-#         pass
-pass
+class ResponseAgent:
+    """
+    Final response generator for the portfolio bot.
+
+    Combines:
+    - User query
+    - Retrieved documents (RAG)
+    - Tool results (TOOL path)
+    - Conversation history
+    into a single, user-facing answer.
+    """
+
+    def __init__(self, owner_name: str = "Portfolio Owner"):
+        self._owner_name = owner_name
+        system_prompt = RESPONSE_SYSTEM_PROMPT.format(owner_name=owner_name)
+
+        # Build a text generation chain for responses
+        self._chain = ChainBuilder(temperature=0.7).build_chain(
+            system_prompt=system_prompt,
+            human_prompt=RESPONSE_HUMAN_PROMPT,
+        )
+        logger.info("ResponseAgent initialized for owner '%s'", owner_name)
+
+    async def run(self, state: NodeState) -> dict:
+        """
+        Generate the final response based on current state.
+
+        Returns a state update containing:
+        - messages: [AIMessage(...)]
+        - final_response: str
+        """
+        messages = state.get("messages", [])
+        documents = state.get("documents", [])
+        tool_result = state.get("tool_result")
+
+        # 1. Extract query from the last HumanMessage
+        query = None
+        for msg in reversed(messages):
+            if isinstance(msg, HumanMessage):
+                query = msg.content
+                break
+
+        if query is None:
+            logger.warning(
+                "ResponseAgent.run called with no HumanMessage; defaulting to empty query."
+            )
+            query = ""
+
+        # 2. Format documents into a context string
+        context_parts = []
+        for idx, doc in enumerate(documents):
+            content = doc.get("content") or doc.get("page_content") or ""
+            if not content:
+                continue
+            metadata = doc.get("metadata", {}) or {}
+            header = f"[Document {idx + 1}]"
+            if metadata:
+                header += f" (metadata: {metadata})"
+            context_parts.append(f"{header}\n{content}")
+        context = "\n\n".join(context_parts) if context_parts else "No retrieved documents."
+
+        # 3. Format tool results
+        tool_results_str = ""
+        if tool_result is not None:
+            tool_results_str = str(tool_result)
+
+        # 4. Conversation history (excluding latest query for clarity)
+        history_parts = []
+        for msg in messages:
+            role = "user" if isinstance(msg, HumanMessage) else "assistant" if isinstance(
+                msg, AIMessage
+            ) else getattr(msg, "type", "message")
+            content = getattr(msg, "content", "")
+            history_parts.append(f"{role}: {content}")
+        conversation_history = "\n".join(history_parts)
+
+        # 5. Invoke chain
+        response_text: str = await self._chain.ainvoke(
+            {
+                "query": query,
+                "context": context,
+                "tool_results": tool_results_str,
+                "conversation_history": conversation_history,
+            }
+        )
+
+        logger.info("ResponseAgent generated response of length %d", len(response_text))
+
+        # 6. Return state update
+        ai_message = AIMessage(content=response_text)
+        return {
+            "messages": [ai_message],
+            "final_response": response_text,
+        }
+

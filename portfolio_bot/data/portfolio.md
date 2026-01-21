@@ -1,86 +1,204 @@
-# Your Portfolio
+# Identity
 
-Welcome! This is your portfolio document. Fill in the sections below with your information, and the chatbot will use this to answer questions about you.
+My name is Zelalem H. (Zelalem Habtamu).  
+I am a backend-heavy full-stack engineer and AI engineer based in Addis Ababa, Ethiopia.  
+I primarily work remotely and am open to contract-to-hire engagements.
 
-## About Me
-
-<!-- Write a brief introduction about yourself -->
-[Your name] is a [your profession] based in [your location].
-
-## Experience
-
-<!-- List your work experience -->
-
-### Current Role
-- **Position**: [Job Title]
-- **Company**: [Company Name]
-- **Duration**: [Start Date] - Present
-- **Description**: [What you do, key responsibilities]
-
-### Previous Roles
-<!-- Add more roles as needed -->
-
-## Skills
-
-<!-- List your technical and soft skills -->
-
-### Technical Skills
-- Programming Languages: [e.g., Python, JavaScript, TypeScript]
-- Frameworks: [e.g., React, FastAPI, LangChain]
-- Tools: [e.g., Docker, Git, AWS]
-- Databases: [e.g., PostgreSQL, MongoDB, ChromaDB]
-
-### Soft Skills
-- [e.g., Communication, Problem-solving, Team leadership]
-
-## Projects
-
-<!-- Describe notable projects you've worked on -->
-
-### Project Name 1
-- **Description**: [What the project does]
-- **Technologies**: [Tech stack used]
-- **My Role**: [Your contribution]
-- **Link**: [URL if available]
-
-### Project Name 2
-<!-- Add more projects as needed -->
-
-## Education
-
-<!-- Your educational background -->
-- **Degree**: [Degree Name]
-- **Institution**: [School/University Name]
-- **Year**: [Graduation Year]
-- **Notable Achievements**: [Awards, honors, relevant coursework]
-
-## Certifications
-
-<!-- Any relevant certifications -->
-- [Certification Name] - [Issuing Organization] - [Year]
-
-## Contact
-
-<!-- How to reach you -->
-- **Email**: [your.email@example.com]
-- **LinkedIn**: [linkedin.com/in/yourprofile]
-- **GitHub**: [github.com/yourusername]
-- **Website**: [yourwebsite.com]
-
-## Availability
-
-<!-- Information about your availability for work/projects -->
-[e.g., Available for freelance projects, Open to full-time opportunities, Currently not available]
+I have over 5 years of professional experience building scalable backend systems, AI-powered applications, and production-ready platforms.
 
 ---
 
-## Tips for Best Results
+# Professional Summary
 
-1. **Be Specific**: Include concrete details, numbers, and examples
-2. **Use Keywords**: Include terms people might search for
-3. **Keep it Updated**: Regularly update with new projects and skills
-4. **Add Context**: Explain why things matter, not just what they are
-5. **Be Authentic**: Write in your own voice
+I am a backend-focused full-stack engineer and AI engineer with experience leading backend teams and designing high-scale systems. My work centers on building reliable, secure, and maintainable backend architectures, as well as AI systems that deliver real business value.
+
+I have led backend development for large, multi-service platforms, collaborated closely with product and frontend teams, and delivered systems designed for long-term scalability and performance.
+
+---
+
+# Core Expertise
+
+## Backend Engineering
+
+- Python (FastAPI, Django)
+- AI application backends with LangChain and LangGraph
+- Node.js, NestJS, Express.js
+- Microservices architecture
+- RESTful APIs and GraphQL
+- API design and service orchestration
+- Authentication and authorization (JWT, OAuth)
+- Webhooks and third-party integrations
+- Caching and performance optimization
+- Clean architecture and maintainable codebases
+
+## Frontend Engineering
+
+- React.js
+- Next.js
+- Angular
+- HTML5, CSS3, JavaScript
+
+## Mobile Development
+
+- React Native
+- Flutter
+
+## Databases
+
+- PostgreSQL
+- MongoDB
+- MySQL
+- Mongoose
+- Data modeling and query optimization
+
+## DevOps & Infrastructure
+
+- Docker
+- Kubernetes
+- AWS
+- Cloudflare
+- Vercel
+- Secure deployments and production environments
+
+---
+
+# Backend Leadership Experience
+
+## Backend Team Lead – High-Scale E-Learning Platform
+
+I served as a backend team lead for a high-scale e-learning platform with a rapidly growing user base and extensive third-party integrations.
+
+The platform required a robust backend architecture to support multiple independent services, real-time events, notifications, and external integrations.
+
+### Responsibilities
+
+- Led backend architecture and API design using a microservices approach
+- Designed and maintained approximately 15 microservices
+- Coordinated backend development efforts across the team
+- Ensured code quality, performance, and long-term maintainability
+- Implemented scalable, secure, and production-ready backend services
+
+### Key Microservices I Owned
+
+- Social services
+- Notification services
+- Profile services
+- Webhook microservices for third-party integrations
+
+### Technologies
+
+- NestJS
+- Node.js
+- Microservices architecture
+- REST APIs
+- Authentication and authorization
+- Event-driven communication
+
+Platform: https://aladia.io/
+
+---
+
+# Product-Focused Backend Experience
+
+## Online Education Platform – Scalable Learning System
+
+I worked on an online education platform focused on delivering structured learning content with strong emphasis on performance, reliability, and maintainability.
+
+The system was built to support real users, scalable course delivery, and secure user management.
+
+### Responsibilities
+
+- Backend feature development
+- API design and optimization
+- User and content management systems
+- Ensuring platform stability and performance under real-world usage
+
+Platform: https://www.havanacademy.com/home
+
+---
+
+# AI & Automation Experience
+
+I have hands-on experience building AI-driven automation systems that streamline workflows and enhance operational efficiency.
+
+## AI Automation & Agents
+
+- AI agents for task automation and orchestration
+- Multi-agent workflows using LangChain and LangGraph
+- Tool-augmented LLM systems integrated with APIs and services
+- Automation using Zapier, n8n, and custom backend integrations
+
+## Retrieval-Augmented Generation (RAG)
+
+- End-to-end RAG pipeline design
+- Document chunking and embedding strategies
+- Vector databases: ChromaDB, Supabase, Pinecone
+- Real-time knowledge retrieval for grounded LLM responses
+- Reducing hallucinations through structured context injection
+
+## LLM & Model Experience
+
+- OpenAI (GPT-4, GPT-4o)
+- Claude
+- DeepSeek
+- Mistral
+- Open-source and hosted LLMs
+- Voice AI with Whisper, ElevenLabs, Livekit, Vapi
+
+---
+
+# Notable AI Projects
+
+- AI assistant automating report generation across departments
+- Voice-enabled chatbot trained on proprietary internal documentation
+- Multi-agent platform coordinating operations for a logistics startup
+- Real-time RAG system integrating internal knowledge bases and search
+
+---
+
+# Availability & Work Preferences
+
+I am currently available for **both full-time and part-time work**.
+
+- Availability: 30+ hours per week
+- Open to full-time, part-time, contract, and contract-to-hire roles
+- Fully remote
+- Comfortable working with distributed and international teams
+- Clear communication and transparent collaboration
+
+---
+
+# Education
+
+Bachelor of Science (BSc) in Software Engineering  
+Addis Ababa University  
+2021 – 2025
+
+---
+
+# Languages
+
+- English: Native / Bilingual proficiency
+- Amharic: Native / Bilingual proficiency
+
+---
+
+# Profiles & Links
+
+GitHub: https://github.com/zelalem61  
+LinkedIn: https://www.linkedin.com/in/zelalem-habtamu-6abab7264/
+
+---
+
+# LLM Answering Guidelines
+
+When answering questions as me:
+- Respond in the first person
+- Be concise, factual, and professional
+- Emphasize real-world experience and production systems
+- Avoid exaggeration or unsupported claims
+- If a topic is outside my experience, answer honestly and redirect to related expertise
+
 
 After editing this file, run the ingestion script:
 ```bash

@@ -37,23 +37,75 @@ T = TypeVar("T", bound=BaseModel)
 
 
 # =============================================================================
-# TODO: Implement ChainBuilder Class
+# ChainBuilder Class
 # =============================================================================
-# class ChainBuilder:
-#     def __init__(self, temperature: float = 0.7):
-#         self._llm_manager = get_llm_manager()
-#         self._temperature = temperature
-#
-#     def build_chain(self, system_prompt: str, human_prompt: str, temperature: Optional[float] = None):
-#         # 1. Create ChatPromptTemplate.from_messages([("system", ...), ("human", ...)])
-#         # 2. Get LLM from llm_manager
-#         # 3. Return: prompt | llm | StrOutputParser()
-#         pass
-#
-#     def build_structured_chain(self, system_prompt: str, human_prompt: str,
-#                                output_model: Type[T], temperature: Optional[float] = None):
-#         # 1. Create prompt template
-#         # 2. Get LLM and call llm.with_structured_output(output_model)
-#         # 3. Return: prompt | structured_llm
-#         pass
-pass
+
+
+class ChainBuilder:
+    """
+    Helper for constructing LCEL chains with a shared LLM manager.
+
+    Provides:
+    - `build_chain` for simple text output chains
+    - `build_structured_chain` for Pydantic structured output
+    """
+
+    def __init__(self, temperature: float = 0.7):
+        self._llm_manager = get_llm_manager()
+        self._temperature = temperature
+
+    def _get_llm(self, temperature: Optional[float] = None):
+        """Get a chat model with the requested temperature (or default)."""
+        temp = self._temperature if temperature is None else temperature
+        return self._llm_manager.get_chat_model(temperature=temp)
+
+    def build_chain(
+        self,
+        system_prompt: str,
+        human_prompt: str,
+        temperature: Optional[float] = None,
+    ):
+        """
+        Build a simple text chain: prompt | llm | StrOutputParser().
+        """
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", system_prompt),
+                ("human", human_prompt),
+            ]
+        )
+
+        llm = self._get_llm(temperature=temperature)
+
+        chain = prompt | llm | StrOutputParser()
+        logger.info("Built text chain with temperature=%s", temperature or self._temperature)
+        return chain
+
+    def build_structured_chain(
+        self,
+        system_prompt: str,
+        human_prompt: str,
+        output_model: Type[T],
+        temperature: Optional[float] = None,
+    ):
+        """
+        Build a structured-output chain: prompt | llm.with_structured_output(model).
+        """
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", system_prompt),
+                ("human", human_prompt),
+            ]
+        )
+
+        llm = self._get_llm(temperature=temperature)
+        structured_llm = llm.with_structured_output(output_model)
+
+        chain = prompt | structured_llm
+        logger.info(
+            "Built structured chain with model=%s and temperature=%s",
+            output_model.__name__,
+            temperature or self._temperature,
+        )
+        return chain
+

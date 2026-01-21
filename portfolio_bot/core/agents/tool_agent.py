@@ -30,6 +30,8 @@ WHAT YOU'LL LEARN:
 - Error handling for external calls
 """
 
+from typing import Any, Callable, Dict
+
 from portfolio_bot.core.state import NodeState
 from portfolio_bot.logs.logger import get_logger
 
@@ -70,9 +72,11 @@ class ToolAgent:
                 "calendar": check_availability,
             }
         """
-        # Placeholder: No tools registered yet
-        self._tools = {}
-        logger.info("ToolAgent initialized (placeholder - implement tools!)")
+        # Tool registry: map tool_name -> callable. Start empty; as you
+        # implement tools in `portfolio_bot.core.tools`, import and
+        # register them here.
+        self._tools: Dict[str, Callable[..., Any]] = {}
+        logger.info("ToolAgent initialized with %d registered tools", len(self._tools))
 
     async def run(self, state: NodeState) -> dict:
         """
@@ -96,44 +100,36 @@ class ToolAgent:
                 return {"tool_result": f"Unknown tool: {tool_name}"}
         """
         tool_name = state.get("tool_name")
-        tool_args = state.get("tool_args", {})
+        tool_args = state.get("tool_args", {}) or {}
 
-        logger.info(f"Tool requested: {tool_name} (args: {tool_args})")
+        logger.info("Tool requested: %s (args: %s)", tool_name, tool_args)
 
-        # =================================================================
-        # PLACEHOLDER IMPLEMENTATION
-        # =================================================================
-        # This is a placeholder response. Replace with actual tool execution.
-        #
-        # To implement:
-        # 1. Create tools in core/tools/ (see example below)
-        # 2. Import and register them in __init__
-        # 3. Call the tool here and return the result
+        # No specific tool requested
+        if not tool_name:
+            logger.warning("ToolAgent.run called without a tool_name in state.")
+            return {"tool_result": "No tool requested."}
 
-        if tool_name == "email":
-            # Placeholder response for email tool
-            result = (
-                "📧 EMAIL TOOL (Placeholder)\n"
-                "This tool would send an email. To implement:\n"
-                "1. Create portfolio_bot/core/tools/email_tool.py\n"
-                "2. Use a service like SendGrid, Mailjet, or SMTP\n"
-                "3. Register the tool in ToolAgent.__init__\n"
-                "4. Execute it here and return the result"
-            )
-        elif tool_name == "calendar":
-            # Placeholder response for calendar tool
-            result = (
-                "📅 CALENDAR TOOL (Placeholder)\n"
-                "This tool would check calendar availability. To implement:\n"
-                "1. Create portfolio_bot/core/tools/calendar_tool.py\n"
-                "2. Integrate with Google Calendar API or similar\n"
-                "3. Register the tool in ToolAgent.__init__\n"
-                "4. Execute it here and return the result"
-            )
-        else:
-            result = f"Unknown tool: {tool_name}. Available tools: email, calendar"
+        # Look up the tool in the registry
+        tool = self._tools.get(tool_name)
+        if tool is None:
+            available = ", ".join(self._tools.keys()) or "none"
+            msg = f"Unknown tool: {tool_name}. Available tools: {available}"
+            logger.warning(msg)
+            return {"tool_result": msg}
 
-        logger.info(f"Tool result: {result[:50]}...")
+        # Execute tool (supports both async and sync callables)
+        try:
+            import inspect
+
+            if inspect.iscoroutinefunction(tool):
+                result = await tool(**tool_args)
+            else:
+                result = tool(**tool_args)
+        except Exception as exc:  # pragma: no cover
+            logger.error("Error while executing tool %s: %s", tool_name, exc)
+            return {"tool_result": f"Error executing tool '{tool_name}': {exc}"}
+
+        logger.info("Tool %s executed successfully", tool_name)
         return {"tool_result": result}
 
 

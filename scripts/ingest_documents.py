@@ -172,7 +172,8 @@ async def ingest_documents(file_path: Path, clear: bool = False) -> None:
 
     logger.info(f"Successfully ingested {count} chunks")
     print(f"\n✅ Successfully ingested {count} chunks into ChromaDB!")
-    print(f"   Total documents in store: {vs.get_document_count()}")
+    total_docs = await vs.get_document_count()
+    print(f"   Total documents in store: {total_docs}")
 
 
 def main():
