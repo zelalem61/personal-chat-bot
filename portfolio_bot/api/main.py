@@ -32,8 +32,6 @@ from portfolio_bot.configs.app_config import get_config
 from portfolio_bot.api.routes.chat import router as chat_router
 from portfolio_bot.logs.logger import setup_logging, get_logger
 from portfolio_bot.core.graph import PortfolioBot
-import os
-import uvicorn
 
 
 setup_logging()
@@ -97,11 +95,3 @@ async def chat_ui():
     return FileResponse(_STATIC_DIR / "index.html")
 
 
-if __name__ == "__main__":
-    port = int(os.environ.get("API_PORT", 8000))
-    uvicorn.run(
-        "portfolio_bot.api.main:app",
-        host="0.0.0.0",
-        port=port,
-        reload=False,
-    )
