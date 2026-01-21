@@ -32,6 +32,9 @@ from portfolio_bot.configs.app_config import get_config
 from portfolio_bot.api.routes.chat import router as chat_router
 from portfolio_bot.logs.logger import setup_logging, get_logger
 from portfolio_bot.core.graph import PortfolioBot
+import os
+import uvicorn
+
 
 setup_logging()
 logger = get_logger(__name__)
