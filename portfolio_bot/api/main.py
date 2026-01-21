@@ -95,6 +95,10 @@ async def chat_ui():
 
 
 if __name__ == "__main__":
-    import uvicorn
-    config = get_config()
-    uvicorn.run("portfolio_bot.api.main:app", host=config.api_host, port=config.api_port, reload=True)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(
+        "portfolio_bot.api.main:app",
+        host="0.0.0.0",
+        port=port,
+        reload=False,
+    )
