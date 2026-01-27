@@ -94,6 +94,8 @@ chatbot/
 └── docs/                 # Learning documentation
 ```
 
+
+
 ## The Graph Architecture
 
 ```
@@ -130,6 +132,8 @@ START
 - Add conversation memory (checkpointing)
 - Add streaming responses
 - Add more routes (e.g., smalltalk, unknown)
+
+
 
 ## Key Files to Study
 
@@ -182,13 +186,3 @@ python -m portfolio_bot.core.agents.router
 - [ChromaDB Documentation](https://docs.trychroma.com/)
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
 
-## Based On
-
-This project is a simplified version of [Algorise-Lyntel](https://github.com/Algorise-Ltd/algorise-lyntel), a production multi-agent RAG chatbot. The production version includes:
-- 15+ specialized agents
-- Multiple LLM providers with fallbacks
-- Conversation checkpointing with PostgreSQL
-- Celery for async processing
-- Advanced routing and query enrichment
-
-Happy learning!
